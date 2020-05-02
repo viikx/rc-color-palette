@@ -59,14 +59,7 @@ export default function ColorPalettes(params) {
             pos.current.x + e.clientX - Initial.x,
             pos.current.y + e.clientY - Initial.y
           );
-          setcolor(
-            tinycolor({
-              h: hue.value,
-              s: x / 2,
-              v: 100 - y / 2,
-            })
-          );
-
+          setcolor(tinycolor({ h: hue.value, s: x / 2, v: 100 - y / 2 }));
           dragCloneRef.current.style.transform = `translate(${x - 5}px, ${
             y - 5
           }px)`;
@@ -74,12 +67,9 @@ export default function ColorPalettes(params) {
       >
         <div
           className="color-picker"
-          style={{
-            visibility: !isDrag ? "hidden" : "visible",
-          }}
+          style={{ visibility: !isDrag ? "hidden" : "visible" }}
           ref={dragCloneRef}
-        ></div>
-
+        />
         <div
           className="color-picker"
           ref={dragRef}
@@ -88,6 +78,7 @@ export default function ColorPalettes(params) {
               pos.current.y - 5
             }px)`,
             background: `${color?.toHexString()}`,
+            opacity: isDrag ? 0 : 1,
           }}
           draggable="true"
           onDragStart={(e) => {
@@ -96,7 +87,6 @@ export default function ColorPalettes(params) {
             img.src =
               "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' %3E%3Cpath /%3E%3C/svg%3E";
             e.dataTransfer.setDragImage(img, 0, 0);
-            dragRef.current.style.opacity = 0;
             setIsDrag(true);
           }}
           onDragEnd={(e) => {
@@ -105,19 +95,11 @@ export default function ColorPalettes(params) {
               pos.current.y + e.clientY - Initial.y
             );
 
-            pos.current.x = x;
-            pos.current.y = y;
-            setcolor(
-              tinycolor({
-                h: hue.value,
-                s: pos.current.x / 2,
-                v: 100 - pos.current.y / 2,
-              })
-            );
-            dragRef.current.style.opacity = 1;
+            pos.current = { x, y };
+            setcolor(tinycolor({ h: hue.value, s: x / 2, v: 100 - y / 2 }));
             setIsDrag(false);
           }}
-        ></div>
+        />
       </section>
 
       <section className="select-hue">
