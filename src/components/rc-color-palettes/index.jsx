@@ -59,6 +59,14 @@ export default function ColorPalettes(params) {
             pos.current.x + e.clientX - Initial.x,
             pos.current.y + e.clientY - Initial.y
           );
+          setcolor(
+            tinycolor({
+              h: hue.value,
+              s: x / 2,
+              v: 100 - y / 2,
+            })
+          );
+
           dragCloneRef.current.style.transform = `translate(${x - 5}px, ${
             y - 5
           }px)`;
