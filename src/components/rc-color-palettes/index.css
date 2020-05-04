@@ -45,5 +45,24 @@
   width: 6px;
   border: 2px solid #fff;
   box-sizing: border-box;
-  /* background-color: #fff; */
+}
+.color-palettes-warpper {
+  display: flex;
+}
+.select-color {
+  margin-left: 10px;
+}
+
+.select-color-content {
+  width: 50px;
+  height: 50px;
+}
+.select-color-value {
+  font-size: 12px;
+  color: #666;
+  font-weight: lighter;
+  margin-top: 10px;
+}
+.select-color-value span {
+  letter-spacing: 1px;
 }

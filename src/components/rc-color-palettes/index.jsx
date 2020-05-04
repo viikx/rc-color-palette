@@ -14,10 +14,10 @@ function useRange() {
   };
 }
 
-export default function ColorPalettes(params) {
+export default function ColorPalettes({ onChange }) {
   const hue = useRange();
   const [Initial, setInitial] = useState();
-  const [color, setcolor] = useState();
+  const [color, setcolor] = useState(tinycolor("#fff"));
   const [isDrag, setIsDrag] = useState(false);
   const pos = useRef({ x: 0, y: 0 });
   const dragRef = useRef();
@@ -33,6 +33,10 @@ export default function ColorPalettes(params) {
     );
   }, [hue.value]);
 
+  useEffect(() => {
+    onChange && onChange(color);
+  }, [color]);
+
   const limit = useCallback((x, y) => {
     x = x < 0 ? 0 : x;
     x = x > 200 ? 200 : x;
@@ -42,76 +46,87 @@ export default function ColorPalettes(params) {
   }, []);
 
   return (
-    <article>
-      <section
-        className="palettes"
-        style={{
-          background: `linear-gradient(to right, transparent, ${
-            tinycolor({ h: hue.value, s: 100, v: 100 })?.toHexString() ?? "#f00"
-          })`,
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-        }}
-        onDragOver={(e) => {
-          e.preventDefault();
-          let { x, y } = limit(
-            pos.current.x + e.clientX - Initial.x,
-            pos.current.y + e.clientY - Initial.y
-          );
-          setcolor(tinycolor({ h: hue.value, s: x / 2, v: 100 - y / 2 }));
-          dragCloneRef.current.style.transform = `translate(${x - 5}px, ${
-            y - 5
-          }px)`;
-        }}
-      >
-        <div
-          className="color-picker"
-          style={{ visibility: !isDrag ? "hidden" : "visible" }}
-          ref={dragCloneRef}
-        />
-        <div
-          className="color-picker"
-          ref={dragRef}
+    <article className="color-palettes-warpper">
+      <section>
+        <section
+          className="palettes"
           style={{
-            transform: `translate(${pos.current.x - 5}px, ${
-              pos.current.y - 5
-            }px)`,
-            background: `${color?.toHexString()}`,
-            opacity: isDrag ? 0 : 1,
+            background: `linear-gradient(to right, transparent, ${
+              tinycolor({ h: hue.value, s: 100, v: 100 })?.toHexString() ??
+              "#f00"
+            })`,
           }}
-          draggable="true"
-          onDragStart={(e) => {
-            setInitial({ x: e.clientX, y: e.clientY });
-            const img = new Image();
-            img.src =
-              "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' %3E%3Cpath /%3E%3C/svg%3E";
-            e.dataTransfer.setDragImage(img, 0, 0);
-            setIsDrag(true);
+          onDrop={(e) => {
+            e.preventDefault();
           }}
-          onDragEnd={(e) => {
+          onDragOver={(e) => {
+            e.preventDefault();
             let { x, y } = limit(
               pos.current.x + e.clientX - Initial.x,
               pos.current.y + e.clientY - Initial.y
             );
-
-            pos.current = { x, y };
             setcolor(tinycolor({ h: hue.value, s: x / 2, v: 100 - y / 2 }));
-            setIsDrag(false);
+            dragCloneRef.current.style.transform = `translate(${x - 5}px, ${
+              y - 5
+            }px)`;
           }}
-        />
-      </section>
+        >
+          <div
+            className="color-picker"
+            style={{ visibility: !isDrag ? "hidden" : "visible" }}
+            ref={dragCloneRef}
+          />
+          <div
+            className="color-picker"
+            ref={dragRef}
+            style={{
+              transform: `translate(${pos.current.x - 5}px, ${
+                pos.current.y - 5
+              }px)`,
+              background: `${color?.toHexString()}`,
+              opacity: isDrag ? 0 : 1,
+            }}
+            draggable="true"
+            onDragStart={(e) => {
+              setInitial({ x: e.clientX, y: e.clientY });
+              const img = new Image();
+              img.src =
+                "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' %3E%3Cpath /%3E%3C/svg%3E";
+              e.dataTransfer.setDragImage(img, 0, 0);
+              setIsDrag(true);
+            }}
+            onDragEnd={(e) => {
+              let { x, y } = limit(
+                pos.current.x + e.clientX - Initial.x,
+                pos.current.y + e.clientY - Initial.y
+              );
 
-      <section className="select-hue">
-        <input type="range" {...hue} min={0} max={360} />
+              pos.current = { x, y };
+              setcolor(tinycolor({ h: hue.value, s: x / 2, v: 100 - y / 2 }));
+              setIsDrag(false);
+            }}
+          />
+        </section>
+
+        <section className="select-hue">
+          <input type="range" {...hue} min={0} max={360} />
+        </section>
       </section>
-      <section>
-        {color?.toHexString()}
-        <br />
-        {color?.toHsvString()}
-        <br />
-        {color?.toRgbString()}
-        <br />
+      <section className="select-color">
+        <div
+          className="select-color-content"
+          style={{ background: color?.toHexString() }}
+        ></div>
+        <div className="select-color-value">
+          <span>HEX:</span> {color?.toHexString()}
+          <br />
+          <span>HSV:</span>
+          {color?.toHsvString()}
+          <br />
+          <span>GRB:</span>
+          {color?.toRgbString()}
+          <br />
+        </div>
       </section>
     </article>
   );
